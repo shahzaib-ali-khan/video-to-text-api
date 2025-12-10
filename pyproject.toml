@@ -1,0 +1,33 @@
+[project]
+name = "video-transcriber"
+version = "0.1.0"
+description = "Generates sub-title for the input video"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django==5.0",
+    "djangorestframework>=3.16.1",
+    "ffmpeg-python>=0.2.0",
+    "openai>=2.9.0",
+    "uvicorn>=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "django-extensions>=4.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.8",
+]
+
+[tool.ruff]
+line-length = 125
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
