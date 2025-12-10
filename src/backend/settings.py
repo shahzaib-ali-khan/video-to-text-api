@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "django_extensions",
+    "transcriber",
+    "django_extensions",  # FIXME: use only in debug mode
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,9 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = []
+
+# Celery settings
+
+CELERY_TIMEZONE = "UTC"
+CELERY_BROKER_URL = "redis://localhost:6372"
+CELERY_RESULT_BACKEND = "redis://localhost:6372"
