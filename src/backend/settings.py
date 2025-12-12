@@ -39,10 +39,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "transcriber",
-    "django_extensions",  # FIXME: use only in debug mode
 ]
 
+if DEBUG:
+    INSTALLED_APPS.append("django_extensions")
+
 MIDDLEWARE = [
+    "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -80,6 +83,16 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
+}
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
 
@@ -127,3 +140,5 @@ STATICFILES_DIRS = []
 CELERY_TIMEZONE = "UTC"
 CELERY_BROKER_URL = "redis://localhost:6372"
 CELERY_RESULT_BACKEND = "redis://localhost:6372"
+OPEN_AI_API_KEY = ""
+ASSEMBLY_AI_API_KEY = ""

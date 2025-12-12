@@ -5,17 +5,23 @@ description = "Generates sub-title for the input video"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "assemblyai>=0.48.2",
+    "celery>=5.6.0",
     "django==5.0",
+    "django-enum>=2.3.0",
     "djangorestframework>=3.16.1",
     "ffmpeg-python>=0.2.0",
     "openai>=2.9.0",
-    "uvicorn>=0.38.0",
+    "python-magic-bin>=0.4.14",
+    "redis>=7.1.0",
+    "structlog>=25.5.0",
 ]
 
 [dependency-groups]
 dev = [
     "django-extensions>=4.1",
     "pytest>=9.0.2",
+    "pytest-django>=4.11.1",
     "ruff>=0.14.8",
 ]
 
@@ -31,3 +37,14 @@ ignore = ["E501"]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
+
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "backend.settings"
+testpaths = ["tests"]
+python_files = [
+    "tests.py",
+    "test_*.py",
+    "*_tests.py",
+]
+pythonpath = ["src"]
