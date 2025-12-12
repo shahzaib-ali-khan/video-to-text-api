@@ -14,8 +14,8 @@ def test_signup_success(api_client: APIClient):
     response = api_client.post(reverse("signup"), payload)
 
     assert response.status_code == 201
-    assert response.data["username"] == "alice"
-    assert "id" in response.data
+    assert response.data.get("user", {}).get("username") == "alice"
+    assert "id" in response.data.get("user", {})
 
 
 @pytest.mark.django_db
@@ -37,10 +37,8 @@ def test_login_success(api_client: APIClient, user):
     response = api_client.post(reverse("login"), {"username": "testuser", "password": "password123"})
 
     assert response.status_code == 200
-    assert response.data["message"] == "Logged in successfully"
-
-    # Session cookie must be set
-    assert "sessionid" in response.cookies
+    assert response.data.keys() == {"token", "user"}
+    assert response.data.get("token")
 
 
 @pytest.mark.django_db

@@ -19,15 +19,17 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from .authentication import SignupView, LoginView, LogoutView, MeView
+
+from .authentication import LoginView, LogoutView, MeView, SignupView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("signup/", SignupView.as_view(), name="signup"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
-    path("me/", MeView.as_view(), name="me"),
+    path("auth/signup/", SignupView.as_view(), name="signup"),
+    path("auth/login/", LoginView.as_view(), name="login"),
+    path("auth/logout/", LogoutView.as_view(), name="logout"),
+    path("auth/me/", MeView.as_view(), name="me"),
     path("api/", include("api")),
+    path("api-auth/", include("rest_framework.urls")),  # for REST Framework browsable API login/logout
 ]
 
 if settings.DEBUG:

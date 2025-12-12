@@ -1,12 +1,9 @@
-from django.contrib.auth import login, logout
-from rest_framework import status
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework import serializers, status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-
-from django.contrib.auth import get_user_model, authenticate
-from rest_framework import serializers
-
 
 User = get_user_model()
 
@@ -31,10 +28,10 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        username = attrs.get("username")
-        password = attrs.get("password")
-
-        user = authenticate(username=username, password=password)
+        user = authenticate(
+            username=attrs.get("username"),
+            password=attrs.get("password"),
+        )
         if not user:
             raise serializers.ValidationError("Invalid username or password")
 
@@ -50,33 +47,56 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def post(self, request):
-        ser = SignupSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        user = ser.save()
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        serializer = SignupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
+
+        return Response(
+            {
+                "user": UserSerializer(user).data,
+                "token": token.key,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def post(self, request):
-        ser = LoginSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        user = ser.validated_data["user"]
-        login(request, user)
+        user = serializer.validated_data["user"]
 
-        return Response({"message": "Logged in successfully"})
+        # Create OR return existing token
+        token, _ = Token.objects.get_or_create(user=user)
+
+        return Response(
+            {
+                "token": token.key,
+                "user": UserSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        logout(request)
-        return Response({"message": "Logged out"})
+        Token.objects.filter(user=request.user).delete()
+        return Response({"message": "Logged out"}, status=status.HTTP_200_OK)
 
 
 class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         return Response(UserSerializer(request.user).data)
