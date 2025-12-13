@@ -19,6 +19,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from .authentication import LoginView, LogoutView, MeView, SignupView
 
@@ -30,6 +31,10 @@ urlpatterns = [
     path("auth/me/", MeView.as_view(), name="me"),
     path("api/", include("api")),
     path("api-auth/", include("rest_framework.urls")),  # for REST Framework browsable API login/logout
+    # OpenAI documentation UI
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
 
 if settings.DEBUG:

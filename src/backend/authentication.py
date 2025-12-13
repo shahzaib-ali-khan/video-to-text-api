@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, get_user_model
+from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -49,6 +50,13 @@ class SignupView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @extend_schema(
+        tags=["Authentication"],
+        operation_id="Signup",
+        description="User signup endpoint",
+        request=SignupSerializer,
+        responses=UserSerializer,
+    )
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -69,6 +77,18 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    @extend_schema(
+        tags=["Authentication"],
+        operation_id="Sigin",
+        description="User sigin endpoint",
+        request=LoginSerializer,
+        responses={
+            200: inline_serializer(
+                name="SigninResponse",
+                fields={"token": serializers.CharField(), "user": UserSerializer()},
+            )
+        },
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -90,6 +110,18 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["Authentication"],
+        operation_id="Logout",
+        description="Signout endpoint",
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="LogoutResponse",
+                fields={"message": serializers.CharField(default="Logged out")},
+            )
+        },
+    )
     def post(self, request):
         Token.objects.filter(user=request.user).delete()
         return Response({"message": "Logged out"}, status=status.HTTP_200_OK)
@@ -98,5 +130,11 @@ class LogoutView(APIView):
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["Authentication"],
+        operation_id="Me",
+        description="Get current authenticated user",
+        responses=UserSerializer,
+    )
     def get(self, request):
         return Response(UserSerializer(request.user).data)

@@ -10,6 +10,8 @@ dependencies = [
     "django==5.0",
     "django-enum>=2.3.0",
     "djangorestframework>=3.16.1",
+    "drf-nested-routers>=0.95.0",
+    "drf-spectacular[sidecar]>=0.29.0",
     "ffmpeg-python>=0.2.0",
     "openai>=2.9.0",
     "python-magic-bin>=0.4.14",

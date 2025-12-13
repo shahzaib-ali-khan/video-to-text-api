@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -8,10 +9,34 @@ from transcriber.models.transcription import TranscriptionStatus
 from transcriber.tasks import handle_transcripts
 
 from ..util import temp_path_of_uploaded_video
-from .serializers import TranscriptionDataSerializer, TranscriptSerializer, VideoSerializer
+from .serializers import TranscriptSerializer, VideoSerializer
 
 
-class TranscriptsViewSet(viewsets.ReadOnlyModelViewSet):
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Transcripts"],
+        operation_id="list_transcripts",
+        summary="List Transcripts",
+        description="Retrieve a list of transcripts for the authenticated user. Superusers can see all transcripts.",
+        responses={200: TranscriptSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        tags=["Transcripts"],
+        operation_id="retrieve_transcripts",
+        summary="Retrieve Transcript",
+        description="Retrieve a transcript for the authenticated user. Superusers can see retrieve any transcript.",
+        responses={200: TranscriptSerializer()},
+    ),
+    generate=extend_schema(
+        tags=["Transcripts"],
+        operation_id="generate_transcripts",
+        summary="Generate Transcript",
+        description="Generate a new transcript from an uploaded video file. The transcription process is handled asynchronously.",
+        request=VideoSerializer,
+        responses={200: TranscriptSerializer()},
+    ),
+)
+class TranscriptViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TranscriptSerializer
     queryset = Transcription.objects.all()
     permission_classes = [IsAuthenticated]
@@ -34,10 +59,3 @@ class TranscriptsViewSet(viewsets.ReadOnlyModelViewSet):
         handle_transcripts.apply_async(args=[transcripts.id, temp_video_path])
 
         return Response(TranscriptSerializer(transcripts).data, status=status.HTTP_202_ACCEPTED)
-
-    @action(detail=True, methods=["get"])
-    def data(self, request, pk):
-        transcripts_data = self.get_object().results.all()
-        serializer = TranscriptionDataSerializer(transcripts_data, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)

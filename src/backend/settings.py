@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "transcriber",
 ]
 
@@ -88,12 +90,28 @@ DATABASES = {
 
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "backend.custom_authentication.TokenOrSessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Transcriber Backend APIs",
+    "DESCRIPTION": "# Backend API Documentation\n\nThis is the API documentation for the Backend service.",
+    "VERSION": "0.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX_TRIM": True,
+    "SCHEMA_PATH_PREFIX": r"/api",
+    "SCHEMA_PATH_PREFIX_INSERT": "/api",
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "LICENSE": {"name": "MIT License"},
 }
 
 
