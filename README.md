@@ -82,4 +82,4 @@ Contributions are welcome! Please open issues or submit pull requests for new fe
 
 ## License
 
-[MIT License](LICENSE)  # Update if your project uses a different license.
+[MIT License](LICENSE)
