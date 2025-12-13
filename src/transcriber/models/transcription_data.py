@@ -14,6 +14,7 @@ class TranscriptionData(models.Model):
     used_model = models.CharField(max_length=50)
 
     generated_text = models.TextField()
+    segments = models.JSONField(default=list)
 
     transcription = models.ForeignKey(Transcription, on_delete=models.CASCADE, related_name="results")
 

@@ -16,16 +16,29 @@ class AssemblyTranscriberLLM(TranscriberLLM):
 
     def transcribe(self) -> dict:
         aai.settings.api_key = self.API_KEY
-        config = aai.TranscriptionConfig(speech_models=["universal"])
+        config = aai.TranscriptionConfig(
+            speech_models=["universal"],
+            auto_highlights=False,
+            entity_detection=False,
+            sentiment_analysis=False,
+            iab_categories=False,
+            speaker_labels=False,
+            summarization=False,
+        )
         transcript = aai.Transcriber(config=config).transcribe(self.audio_path)
 
         if transcript.status == "error":
             raise RuntimeError(transcript.error)
 
-        return {"provider": self.provider_name, "transcript": transcript.text, "raw_response": transcript.__dict__}
+        return {
+            "provider": self.provider_name,
+            "transcript": transcript.text,
+            "words": transcript.words,
+        }
 
-    def extract_result(self, result: Any) -> dict:
+    def extract_text(self, result: Any) -> dict:
         # AssemblyAI returns a dict that contains "transcript"
-        text = result.get("transcript", "")
+        return result.get("transcript", "")
 
-        return {"text": text}
+    def extract_segments(self, result: Any) -> list[dict]:
+        return [{"start": word.start / 1000, "end": word.end / 1000, "text": word.text} for word in result["words"]]

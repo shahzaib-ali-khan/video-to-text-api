@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 import ffmpeg
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class TranscriberLLM(ABC):
@@ -50,6 +53,11 @@ class TranscriberLLM(ABC):
         pass
 
     @abstractmethod
-    def extract_result(self, result: Any) -> dict:
-        """Extract and normalize the transcription result from raw provider output."""
+    def extract_text(self, result: Any) -> dict:
+        """Extract the transcription text from provider output."""
+        pass
+
+    @abstractmethod
+    def extract_segments(self, result: Any) -> list[dict]:
+        """Extract the transcription with segment from provider output."""
         pass

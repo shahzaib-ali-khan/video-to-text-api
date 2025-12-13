@@ -18,11 +18,14 @@ class OpenAITranscriberLLM(TranscriberLLM):
         client = OpenAI(api_key=self.API_KEY)
 
         with open(self.audio_path, "rb") as f:
-            resp = client.audio.transcriptions.create(model="whisper-1", file=f, response_format="json")
+            resp = client.audio.transcriptions.create(
+                model="whisper-1", file=f, response_format="verbose_json", timestamp_granularities=["segment"]
+            )
 
-        return {"provider": self.provider_name, "transcript": resp.get("text", ""), "raw_response": resp}
+        return {"provider": self.provider_name, "transcript": resp.get("text", ""), "segments": resp.get("segments", [])}
 
-    def extract_result(self, result: Any) -> dict:
-        text = result["text"]
-        # result from OpenAI is already JSON-serializable
-        return {"text": text}
+    def extract_text(self, result: Any) -> dict:
+        return result.get("transcript", "")
+
+    def extract_segments(self, result: Any) -> list[dict]:
+        return [{"start": seg["start"], "end": seg["end"], "text": seg["text"].strip()} for seg in result["segments"]]

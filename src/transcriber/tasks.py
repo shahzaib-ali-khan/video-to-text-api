@@ -24,7 +24,13 @@ def handle_transcripts(self, transcription_id: str, video_path: str):
 
     try:
         transcribers = get_available_transcribers(video_path)
+        if not transcribers:
+            logger.warning("No transcription providers available")
+            transcription.status = TranscriptionStatus.FAILED
+            transcription.save(update_fields=["status"])
+            return
 
+        success_count = 0
         with ThreadPoolExecutor(max_workers=len(transcribers)) as executor:
             future_map = {executor.submit(t.transcribe): t for t in transcribers}
 
@@ -36,21 +42,23 @@ def handle_transcripts(self, transcription_id: str, video_path: str):
                     raw_result = future.result()
 
                     # NEW: delegate extraction/normalization to provider
-                    extracted = provider.extract_result(raw_result)
-                    text = extracted["text"]
+                    text = provider.extract_text(raw_result)
+                    segments = provider.extract_segments(raw_result)
 
                     TranscriptionData.objects.create(
                         transcription_id=transcription_id,
                         used_model=provider_name,
-                        generated_text=text.encode("utf-8"),
+                        generated_text=text,
+                        segments=segments,
                         output_language="en",  # FIXME
                     )
+                    success_count += 1
 
                 except Exception as exc:
                     logger.error("Transcription failed", provider=provider_name, error=str(exc))
 
-        # Mark as finished (even if some providers failed)
-        transcription.status = TranscriptionStatus.SUCCESS
+        # Success if at least one provider succeeded
+        transcription.status = TranscriptionStatus.SUCCESS if success_count > 0 else TranscriptionStatus.FAILED
         transcription.save(update_fields=["status"])
 
     except Exception:

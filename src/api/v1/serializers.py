@@ -40,5 +40,5 @@ class TranscriptSerializer(serializers.ModelSerializer):
 class TranscriptionDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = TranscriptionData
-        fields = ["id", "created_at", "output_language", "used_model", "generated_text"]
+        fields = ["id", "created_at", "output_language", "used_model", "generated_text", "segments"]
         read_only_fields = fields
