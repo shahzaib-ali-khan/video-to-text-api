@@ -22,6 +22,9 @@ def get_available_transcribers(video_path: str) -> List[TranscriberLLM]:
     available = []
 
     for provider_cls in ALL_PROVIDERS:
+        if not provider_cls.is_configured():
+            continue
+
         try:
             provider = provider_cls(video_path)
             available.append(provider)

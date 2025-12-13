@@ -17,11 +17,20 @@ class TranscriberLLM(ABC):
 
     def __init__(self, video_path: str):
         self.video_path = video_path
-        self._validate_api_key()
 
-    def _validate_api_key(self):
-        if not self.API_KEY:
-            raise ValueError(f"{self.__class__.__name__}: API_KEY is missing.")
+    @classmethod
+    def is_configured(cls) -> bool:
+        """
+        Return True if the provider is usable (API key present).
+        """
+        if not cls.API_KEY:
+            logger.warning(
+                "Transcriber provider not configured",
+                provider=cls.__name__,
+                reason="API_KEY missing",
+            )
+            return False
+        return True
 
     @property
     @abstractmethod
