@@ -36,8 +36,7 @@ class AssemblyTranscriberLLM(TranscriberLLM):
             "words": transcript.words,
         }
 
-    def extract_text(self, result: Any) -> dict:
-        # AssemblyAI returns a dict that contains "transcript"
+    def extract_text(self, result: Any) -> str:
         return result.get("transcript", "")
 
     def extract_segments(self, result: Any) -> list[dict]:

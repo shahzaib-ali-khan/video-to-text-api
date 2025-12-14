@@ -62,7 +62,7 @@ class TranscriberLLM(ABC):
         pass
 
     @abstractmethod
-    def extract_text(self, result: Any) -> dict:
+    def extract_text(self, result: Any) -> str:
         """Extract the transcription text from provider output."""
         pass
 
