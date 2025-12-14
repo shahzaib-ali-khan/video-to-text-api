@@ -23,7 +23,9 @@ dependencies = [
 dev = [
     "django-extensions>=4.1",
     "pytest>=9.0.2",
+    "pytest-celery>=1.2.1",
     "pytest-django>=4.11.1",
+    "pytest-mock>=3.15.1",
     "ruff>=0.14.8",
 ]
 
