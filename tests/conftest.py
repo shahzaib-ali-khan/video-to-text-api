@@ -5,6 +5,11 @@ from rest_framework.test import APIClient
 
 from transcriber.llms.assembly_ai import AssemblyTranscriberLLM
 from transcriber.llms.open_ai import OpenAITranscriberLLM
+from transcriber.models import Transcription
+from transcriber.models.transcription import TranscriptionStatus
+from transcriber.models.transcription_data import TranscriptionData
+from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 User = get_user_model()
 
@@ -77,3 +82,41 @@ def mock_open_ai_transcription_create(mocker):
     mocker.patch("openai.resources.audio.transcriptions.Transcriptions.create", return_value=mock_resp)
 
     return mock_resp
+
+
+@pytest.fixture
+def transcription_pending_status(user):
+    return Transcription.objects.create(user=user, status=TranscriptionStatus.PENDING)
+
+
+@pytest.fixture
+def transcription_success_status(user):
+    transcription = Transcription.objects.create(user=user, status=TranscriptionStatus.SUCCESS)
+    TranscriptionData.objects.create(
+        transcription=transcription,
+        output_language="en",
+        used_model="openai-whisper",
+        generated_text="This is a successful transcription.",
+        segments=[{"text": "This is a successful transcription.", "start": 0.0, "end": 5.0}],
+    )
+    return transcription
+
+
+@pytest.fixture
+def transcription_success_status_yesterday(user, freezer):
+    now_ = now()
+    # Move to yesterday
+    freezer.move_to(datetime.now() - timedelta(days=1))
+
+    transcription = Transcription.objects.create(user=user, status=TranscriptionStatus.SUCCESS)
+    TranscriptionData.objects.create(
+        transcription=transcription,
+        output_language="en",
+        used_model="openai-whisper",
+        generated_text="This is a successful transcription.",
+        segments=[{"text": "This is a successful transcription.", "start": 0.0, "end": 5.0}],
+    )
+    # Move freezr back to now
+    freezer.move_to(now_)
+
+    return transcription

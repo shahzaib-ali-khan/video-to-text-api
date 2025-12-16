@@ -3,6 +3,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
+from django_filters import rest_framework as filters
 
 from transcriber.models import Transcription
 from transcriber.models.transcription import TranscriptionStatus
@@ -10,6 +12,7 @@ from transcriber.tasks import handle_transcripts
 
 from ..util import temp_path_of_uploaded_video
 from .serializers import TranscriptSerializer, VideoSerializer
+from .filters import TranscriptionFilter
 
 
 @extend_schema_view(
@@ -40,6 +43,9 @@ class TranscriptViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TranscriptSerializer
     queryset = Transcription.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPagination
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = TranscriptionFilter
 
     def get_queryset(self):
         if self.request.user.is_superuser:

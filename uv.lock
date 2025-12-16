@@ -252,6 +252,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-filter"
+version = "25.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b5/40/c702a6fe8cccac9bf426b55724ebdf57d10a132bae80a17691d0cf0b9bac/django_filter-25.1.tar.gz", hash = "sha256:1ec9eef48fa8da1c0ac9b411744b16c3f4c31176c867886e4c48da369c407153", size = 143021, upload-time = "2025-02-14T16:30:53.238Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/a6/70dcd68537c434ba7cb9277d403c5c829caf04f35baf5eb9458be251e382/django_filter-25.1-py3-none-any.whl", hash = "sha256:4fa48677cf5857b9b1347fed23e355ea792464e0fe07244d1fdfb8a806215b80", size = 94114, upload-time = "2025-02-14T16:30:50.435Z" },
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.1"
 source = { registry = "https://pypi.org/simple" }
@@ -343,6 +355,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/dd/5e/d5f9105d59c1325759d838af4e973695081fbbc97182baf73afc78dec266/ffmpeg-python-0.2.0.tar.gz", hash = "sha256:65225db34627c578ef0e11c8b1eb528bb35e024752f6f10b78c011f6f64c4127", size = 21543, upload-time = "2019-07-06T00:19:08.989Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d7/0c/56be52741f75bad4dc6555991fabd2e07b432d333da82c11ad701123888a/ffmpeg_python-0.2.0-py3-none-any.whl", hash = "sha256:ac441a0404e053f8b6a1113a77c0f452f1cfc62f6344a769475ffdc0f56c23c5", size = 25024, upload-time = "2019-07-06T00:19:07.215Z" },
+]
+
+[[package]]
+name = "freezegun"
+version = "1.5.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/dd/23e2f4e357f8fd3bdff613c1fe4466d21bfb00a6177f238079b17f7b1c84/freezegun-1.5.5.tar.gz", hash = "sha256:ac7742a6cc6c25a2c35e9292dfd554b897b517d2dec26891a2e8debf205cb94a", size = 35914, upload-time = "2025-08-09T10:39:08.338Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5e/2e/b41d8a1a917d6581fc27a35d05561037b048e47df50f27f8ac9c7e27a710/freezegun-1.5.5-py3-none-any.whl", hash = "sha256:cd557f4a75cf074e84bc374249b9dd491eaeacd61376b9eb3c423282211619d2", size = 19266, upload-time = "2025-08-09T10:39:06.636Z" },
 ]
 
 [[package]]
@@ -700,6 +724,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-freezer"
+version = "0.4.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "freezegun" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/81/f0/98dcbc5324064360b19850b14c84cea9ca50785d921741dbfc442346e925/pytest_freezer-0.4.9.tar.gz", hash = "sha256:21bf16bc9cc46bf98f94382c4b5c3c389be7056ff0be33029111ae11b3f1c82a", size = 3177, upload-time = "2024-12-12T08:53:08.684Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c1/e9/30252bc05bcf67200a17f4f0b4cc7598f0a68df4fa9fa356193aa899f145/pytest_freezer-0.4.9-py3-none-any.whl", hash = "sha256:8b6c50523b7d4aec4590b52bfa5ff766d772ce506e2bf4846c88041ea9ccae59", size = 3192, upload-time = "2024-12-12T08:53:07.641Z" },
+]
+
+[[package]]
 name = "pytest-mock"
 version = "3.15.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1013,6 +1050,7 @@ dependencies = [
     { name = "celery" },
     { name = "django" },
     { name = "django-enum" },
+    { name = "django-filter" },
     { name = "djangorestframework" },
     { name = "drf-nested-routers" },
     { name = "drf-spectacular", extra = ["sidecar"] },
@@ -1029,6 +1067,7 @@ dev = [
     { name = "pytest" },
     { name = "pytest-celery" },
     { name = "pytest-django" },
+    { name = "pytest-freezer" },
     { name = "pytest-mock" },
     { name = "ruff" },
 ]
@@ -1039,6 +1078,7 @@ requires-dist = [
     { name = "celery", specifier = ">=5.6.0" },
     { name = "django", specifier = "==5.0" },
     { name = "django-enum", specifier = ">=2.3.0" },
+    { name = "django-filter", specifier = ">=25.1" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
     { name = "drf-nested-routers", specifier = ">=0.95.0" },
     { name = "drf-spectacular", extras = ["sidecar"], specifier = ">=0.29.0" },
@@ -1055,6 +1095,7 @@ dev = [
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-celery", specifier = ">=1.2.1" },
     { name = "pytest-django", specifier = ">=4.11.1" },
+    { name = "pytest-freezer", specifier = ">=0.4.9" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
     { name = "ruff", specifier = ">=0.14.8" },
 ]
