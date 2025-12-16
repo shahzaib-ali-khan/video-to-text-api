@@ -58,16 +58,15 @@ class TranscriptDataViewSet(
     serializer_class = TranscriptionDataSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        transcript_id = self.kwargs.get("transcript_pk")
 
-def get_queryset(self):
-    transcript_id = self.kwargs.get("transcript_pk")
+        if not transcript_id:
+            raise ValueError("Transcript ID is required")
 
-    if not transcript_id:
-        raise ValueError("Transcript ID is required")
+        qs = TranscriptionData.objects.filter(transcription_id=transcript_id)
 
-    qs = TranscriptionData.objects.filter(transcription_id=transcript_id)
+        if self.request.user.is_superuser:
+            return qs.order_by("-created_at")
 
-    if self.request.user.is_superuser:
-        return qs.order_by("-created_at")
-
-    return qs.filter(transcription__user=self.request.user).order_by("-created_at")
+        return qs.filter(transcription__user=self.request.user).order_by("-created_at")
