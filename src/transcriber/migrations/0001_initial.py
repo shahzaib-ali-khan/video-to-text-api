@@ -25,12 +25,12 @@ class Migration(migrations.Migration):
                     "status",
                     django_enum.fields.EnumCharField(
                         choices=[
-                            ("PENDING", "Pending"),
-                            ("PROCESSING", "Processing"),
-                            ("SUCCESS", "Success"),
-                            ("FAILED", "Failed"),
+                            ("Pending", "pending"),
+                            ("Processing", "processing"),
+                            ("Success", "success"),
+                            ("Failed", "failed"),
                         ],
-                        default="PENDING",
+                        default="pending",
                         max_length=10,
                     ),
                 ),
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="transcription",
             constraint=models.CheckConstraint(
-                check=models.Q(("status__in", ["PENDING", "PROCESSING", "SUCCESS", "FAILED"])),
+                check=models.Q(("status__in", ["Pending", "Processing", "Success", "Failed"])),
                 name="transcriber_Transcription_status_TranscriptionStatus",
             ),
         ),

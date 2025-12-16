@@ -6,10 +6,10 @@ from django_enum import EnumField
 
 
 class TranscriptionStatus(models.TextChoices):
-    PENDING = "PENDING", "Pending"
-    PROCESSING = "PROCESSING", "Processing"
-    SUCCESS = "SUCCESS", "Success"
-    FAILED = "FAILED", "Failed"
+    PENDING = "Pending", "pending"
+    PROCESSING = "Processing", "processing"
+    SUCCESS = "Success", "success"
+    FAILED = "Failed", "failed"
 
 
 class Transcription(models.Model):
