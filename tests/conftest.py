@@ -1,6 +1,11 @@
+import json
+from datetime import datetime, timedelta
+
 import pytest
+from django.conf import settings as django_settings
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.utils.timezone import now
 from rest_framework.test import APIClient
 
 from transcriber.llms.assembly_ai import AssemblyTranscriberLLM
@@ -8,8 +13,6 @@ from transcriber.llms.open_ai import OpenAITranscriberLLM
 from transcriber.models import Transcription
 from transcriber.models.transcription import TranscriptionStatus
 from transcriber.models.transcription_data import TranscriptionData
-from datetime import datetime, timedelta
-from django.utils.timezone import now
 
 User = get_user_model()
 
@@ -30,6 +33,8 @@ def user():
 
 @pytest.fixture
 def set_dummy_api_key():
+    django_settings.GEMINI_API_KEY = "foo-nord"
+
     AssemblyTranscriberLLM.API_KEY = "test-assembly-key"
     OpenAITranscriberLLM.API_KEY = "test-openai-key"
 
@@ -120,3 +125,95 @@ def transcription_success_status_yesterday(user, freezer):
     freezer.move_to(now_)
 
     return transcription
+
+
+@pytest.fixture
+def mock_gemini_chairman(mocker):
+    """
+    Mock Gemini chairman evaluation response using google-genai SDK.
+    """
+
+    gemini_response_payload = {
+        "audio_analysis": {
+            "duration_estimate": "30 seconds",
+            "audio_quality": "clear",
+            "language_detected": "English",
+            "key_observations": "Single speaker, neutral accent, no background noise",
+        },
+        "A": {
+            "accuracy": {
+                "score": 7,
+                "reasoning": "Minor word omissions and tense errors",
+                "errors_found": ["missing 's' in asks"],
+            },
+            "punctuation": {
+                "score": 7,
+                "reasoning": "Missing commas and sentence endings",
+            },
+            "formatting": {
+                "score": 7,
+                "reasoning": "Readable but lacks paragraph structure",
+            },
+            "completeness": {
+                "score": 8,
+                "reasoning": "Mostly complete",
+                "missing_content": [],
+                "hallucinated_content": [],
+            },
+            "timestamps": {
+                "score": 7,
+                "reasoning": "Mostly aligned",
+            },
+            "total_score": 0,
+            "strengths": ["Clear wording"],
+            "weaknesses": ["Grammar mistakes"],
+        },
+        "B": {
+            "accuracy": {
+                "score": 9,
+                "reasoning": "Matches audio closely",
+                "errors_found": [],
+            },
+            "punctuation": {
+                "score": 8,
+                "reasoning": "Mostly correct punctuation",
+            },
+            "formatting": {
+                "score": 8,
+                "reasoning": "Well structured",
+            },
+            "completeness": {
+                "score": 9,
+                "reasoning": "No missing content",
+                "missing_content": [],
+                "hallucinated_content": [],
+            },
+            "timestamps": {
+                "score": 8,
+                "reasoning": "Good alignment",
+            },
+            "total_score": 0,
+            "strengths": ["High accuracy", "Good structure"],
+            "weaknesses": ["Minor punctuation"],
+        },
+        "comparison": {
+            "winner": "B",
+            "confidence": "high",
+            "score_difference": 1.6,
+            "deciding_factors": ["Accuracy", "Completeness"],
+        },
+        "final_reasoning": "Transcription B aligns more closely with the spoken audio.",
+        "recommendation": "Improve punctuation consistency in transcription A.",
+    }
+
+    # Gemini SDK returns an object with `.text`
+    mock_response = mocker.MagicMock()
+    mock_response.text = json.dumps(gemini_response_payload)
+
+    # Patch the exact SDK call used in your code
+    mocker.patch(
+        "google.genai.models.Models.generate_content",
+        return_value=mock_response,
+    )
+
+    return gemini_response_payload

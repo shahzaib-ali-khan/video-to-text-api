@@ -1,13 +1,14 @@
-import pytest
-from django.urls import reverse
 from datetime import datetime
 
-from transcriber.models import TranscriptionData, Transcription
+import pytest
+from django.urls import reverse
+
+from transcriber.models import Transcription, TranscriptionData
 
 
 @pytest.mark.django_db
 def test_transcription_creation(
-    api_client, load_video_file, mock_assemblyai_transcribe, mock_open_ai_transcription_create, user, set_dummy_api_key
+    api_client, load_video_file, mock_assemblyai_transcribe, mock_open_ai_transcription_create, mock_gemini_chairman, user, set_dummy_api_key
 ):
     api_client.force_authenticate(user=user)
 
@@ -22,7 +23,7 @@ def test_transcription_creation(
     assert response.status_code == 202
     assert "id" in response.data
 
-    assert TranscriptionData.objects.filter(transcription_id=response.data["id"]).count() == 2
+    assert TranscriptionData.objects.filter(transcription_id=response.data["id"]).count() == 1
     assert Transcription.objects.get(id=response.data["id"]).status == "Success"
 
 
