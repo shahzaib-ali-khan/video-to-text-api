@@ -1,18 +1,18 @@
+from django_filters import rest_framework as filters
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
-from django_filters import rest_framework as filters
 
 from transcriber.models import Transcription
 from transcriber.models.transcription import TranscriptionStatus
 from transcriber.tasks import handle_transcripts
+from transcriber.util import temp_path_of_uploaded_video
 
-from ..util import temp_path_of_uploaded_video
-from .serializers import TranscriptSerializer, VideoSerializer
 from .filters import TranscriptionFilter
+from .serializers import TranscriptSerializer, VideoSerializer
 
 
 @extend_schema_view(
